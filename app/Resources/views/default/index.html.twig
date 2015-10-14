@@ -2,12 +2,16 @@
 
 {% block body %}
     <div id="wrapper">
-            <form action="/" method="post" enctype="multipart/form-data">
-                {{ form_widget(form) }}
+        <form action="/" method="post" enctype="multipart/form-data">
+            {{ form_widget(form) }}
 
-                <input type="submit" />
-            </form>
-        <img src="/image.jpg">
-        {#<img src="/image.png">#}
+            <input type="submit"/>
+        </form>
+
+        {% for image in images %}
+            {#<img src="/images/{{ image }}" width="200px" height="200px" style="float: left;">#}
+            <img src="/images/{{ image }}" style="float: left;">
+        {% endfor %}
+
     </div>
 {% endblock %}

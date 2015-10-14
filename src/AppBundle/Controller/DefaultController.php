@@ -2,36 +2,36 @@
 
 namespace AppBundle\Controller;
 
-//use Imagick;
+use AppBundle\Utils\ProgressiveImages\ProgressiveManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Snowcap\ImBundle\Manager;
-use Snowcap\ImBundle\Wrapper;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 
-class DefaultController extends Controller {
+class DefaultController extends Controller
+{
     /**
      * @Route("/", name="homepage")
      */
-    public function indexAction(Request $request) {
+    public function indexAction(Request $request)
+    {
 
         $form = $this->createFormBuilder()
             ->add('image', 'file')// If I remove this line data is submitted correctly
             ->getForm();
 
 
+        $imagesDir = __DIR__ . '/../../../web/images';
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
 
             $file = $form->get('image')->getData();
             $name = $file->getClientOriginalName();
+            (new ProgressiveManager())->processFile($file);
             /**
              * @var UploadedFile $file
              */
-            $path = $file->getRealPath();
-            $dir = __DIR__ . '/../../../web';
-
+//            $path = $file->getRealPath();
 
 //            $image = new \Imagick($path);
 //            $image->setInterlaceScheme(\Imagick::INTERLACE_PNG);
@@ -49,13 +49,20 @@ class DefaultController extends Controller {
 //            imagejpeg($im, $path, 100);
 //            imagedestroy($im);
 
-//            $file->move($dir, 'image.jpg');
-//            $file->move($dir, 'image.png');
+
+            $file->move($imagesDir, time() . "_" . $name);
 
         }
+        $images = [];
+        foreach (new \DirectoryIterator($imagesDir) as $file) {
+            if (!$file->isDir())
+                $images[] = $file->getBasename();
+        }
+
         return $this->render('default/index.html.twig', array(
             'base_dir' => realpath($this->container->getParameter('kernel.root_dir') . '/..'),
             'form' => $form->createView(),
+            'images' => $images
         ));
 
     }
