@@ -27,7 +27,8 @@ class DefaultController extends Controller
 
             $file = $form->get('image')->getData();
             $name = $file->getClientOriginalName();
-            (new ProgressiveManager())->processFile($file);
+
+            $this->get('app.progressive_images')->processFile($file);
             /**
              * @var UploadedFile $file
              */
@@ -51,18 +52,28 @@ class DefaultController extends Controller
 
 
             $file->move($imagesDir, time() . "_" . $name);
+//            $file->move($imagesDir, time() . "_not_progressive_" . $name);
 
         }
         $images = [];
+        $imagesNotProgressive = [];
         foreach (new \DirectoryIterator($imagesDir) as $file) {
-            if (!$file->isDir())
-                $images[] = $file->getBasename();
+            if (!$file->isDir()) {
+                if (strstr($file->getBasename(), 'not_progressive')) {
+                    $imagesNotProgressive[] = $file->getBasename();
+                } else {
+                    $images[] = $file->getBasename();
+                }
+            }
         }
 
         return $this->render('default/index.html.twig', array(
             'base_dir' => realpath($this->container->getParameter('kernel.root_dir') . '/..'),
             'form' => $form->createView(),
-            'images' => $images
+            'images' => $images,
+//            'images' => [],
+//            'imagesNotProgressive' => [end($imagesNotProgressive)]
+            'imagesNotProgressive' => $imagesNotProgressive
         ));
 
     }

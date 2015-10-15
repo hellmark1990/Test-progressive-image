@@ -8,10 +8,21 @@
             <input type="submit"/>
         </form>
 
-        {% for image in images %}
-            {#<img src="/images/{{ image }}" width="200px" height="200px" style="float: left;">#}
-            <img src="/images/{{ image }}" style="float: left;">
+
+
+        {% for image in imagesNotProgressive %}
+            <img src="/images/{{ image }}" width="200px" height="200px" style="float: left;">
+            {#<img src="/images/{{ image }}" style="float: left;">#}
         {% endfor %}
+
+        <br style="clear: left;">
+
+        {% for image in images %}
+            <img src="/images/{{ image }}" width="200px" height="200px" style="float: left;">
+            {#<img src="/images/{{ image }}" style="float: left;">#}
+        {% endfor %}
+
+
 
     </div>
 {% endblock %}
